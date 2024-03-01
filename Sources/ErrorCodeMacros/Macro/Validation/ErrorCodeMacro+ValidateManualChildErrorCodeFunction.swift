@@ -5,7 +5,7 @@ import SwiftDiagnostics
 extension ErrorCodeMacro {
     
     static func shouldGenerateChildErrorCodeFunction(
-        from declaration: EnumDeclSyntax,
+        from declaration: some DeclGroupSyntax,
         with enumCases: [EnumCase],
         isGeneratingOpaqueCodeInitializer: Bool,
         context: some MacroExpansionContext

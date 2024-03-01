@@ -15,7 +15,7 @@ extension ErrorCodeMacro {
 extension ErrorCodeMacro {
     
     static func shouldGenerateOpaqueCodeStaticValues(
-        from declaration: EnumDeclSyntax,
+        from declaration: some DeclGroupSyntax,
         enumCases: [EnumCase]
     ) throws -> Bool {
         
@@ -71,7 +71,7 @@ extension ErrorCodeMacro {
         }
     }
     
-    private static func extractManualOpaqueCodeDeclarationMemberBlock(from declaration: EnumDeclSyntax) throws -> MemberBlockSyntax? {
+    private static func extractManualOpaqueCodeDeclarationMemberBlock(from declaration: some DeclGroupSyntax) throws -> MemberBlockSyntax? {
         
         if 
             let enumDeclaration = declaration.memberBlock.members

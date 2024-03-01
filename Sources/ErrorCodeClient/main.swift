@@ -23,11 +23,19 @@ public enum HTTPStatusCode: Int {
     case notFound = 404
 }
 
-@ErrorCode
 public enum CodingErrorCode {
     
     case encoding
     case decoding
+}
+
+@ErrorCodeExtension
+extension CodingErrorCode: ErrorCode {
+    
+    private static let errorCodes: [Self] = [
+        .encoding,
+        .decoding
+    ]
 }
 
 print(ErrorCodes.networking(subCode: .httpStatusCode(statusCode: .badRequest)).opaqueCode) // 8BUT-gjmR-Tk1iR6

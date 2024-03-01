@@ -5,7 +5,7 @@ import SwiftDiagnostics
 extension ErrorCodeMacro {
     
     static func shouldGenerateOpaqueCodeInitializer(
-        from declaration: EnumDeclSyntax,
+        from declaration: some DeclGroupSyntax,
         accessScopeModifier: TokenSyntax?,
         context: some MacroExpansionContext
     ) throws -> Bool {
@@ -239,14 +239,15 @@ extension ErrorCodeMacro.DiagnosticMessage: SwiftDiagnostics.DiagnosticMessage {
         case .needsToBeFilePrivate:
             "\"init(opaqueCode: _)\" needs to be declared as \"fileprivate\", \"internal\", \"public\", or with no access modifier."
             
+        // TODO: - inject macro name
         case .incorrectParameterName:
-            "Declaration has incorrect parameter name and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by \"@ErrorCode\".\n\nTo silence this warning, move this initializer in to an extension of this type."
+            "Declaration has incorrect parameter name and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by the macro.\n\nTo silence this warning, move this initializer in to an extension of this type."
             
         case .incorrectParameterType:
-            "Declaration has incorrect parameter type and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by \"@ErrorCode\".\n\nTo silence this warning, move this initializer in to an extension of this type."
+            "Declaration has incorrect parameter type and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by the macro.\n\nTo silence this warning, move this initializer in to an extension of this type."
         
         case .incorrectAsyncDeclaration:
-            "Declaration is declared as \"async\" and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by \"@ErrorCode\".\n\nTo silence this warning, move this initializer in to an extension of this type."
+            "Declaration is declared as \"async\" and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by the macro.\n\nTo silence this warning, move this initializer in to an extension of this type."
 
         }
     }

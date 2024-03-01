@@ -4,7 +4,7 @@ import SwiftDiagnostics
 extension ErrorCodeMacro {
     
     static func shouldGenerateOpaqueCodeProperty(
-        from declaration: EnumDeclSyntax,
+        from declaration: some DeclGroupSyntax,
         accessScopeModifier: TokenSyntax?
     ) throws -> Bool {
         

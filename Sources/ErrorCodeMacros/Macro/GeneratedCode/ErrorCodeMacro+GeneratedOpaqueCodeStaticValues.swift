@@ -6,7 +6,7 @@ extension ErrorCodeMacro {
     
     static func generatedOpaqueCodeStaticValues(
         of node: AttributeSyntax,
-        attachedTo declaration: EnumDeclSyntax,
+        attachedTo declaration: some DeclGroupSyntax,
         with enumCases: [EnumCase],
         definingOpaqueCodeLength currentOpaqueCodeLength: Int,
         context: some MacroExpansionContext
@@ -65,7 +65,7 @@ extension ErrorCodeMacro {
     
     private static func assertNoDuplicateGeneratedOpaqueCodes(
         generatedFrom node: AttributeSyntax,
-        attachedTo declaration: EnumDeclSyntax,
+        attachedTo declaration: some DeclGroupSyntax,
         with enumCases: [EnumCase],
         definingOpaqueCodeLength currentOpaqueCodeLength: Int,
         context: some MacroExpansionContext
@@ -124,7 +124,7 @@ extension ErrorCodeMacro {
                 message: DiagnosticMessage.opaqueCodeCollision(duplicateCases),
                 fixIts: [
                     .replace(
-                        message: FixItMessage.useLongerGeneratedCodes(currentLength: currentOpaqueCodeLength),
+                        message: FixItMessage.useLongerGeneratedCodes(currentLength: currentOpaqueCodeLength, macroName: node.attributeName.trimmedDescription),
                         oldNode: node,
                         newNode: fixitNode
                     ),
@@ -187,7 +187,7 @@ extension ErrorCodeMacro.DiagnosticMessage: SwiftDiagnostics.DiagnosticMessage {
 extension ErrorCodeMacro {
     fileprivate enum FixItMessage {
         
-        case useLongerGeneratedCodes(currentLength: Int)
+        case useLongerGeneratedCodes(currentLength: Int, macroName: String)
         case declareManualOpaqueCodes
     }
 }
@@ -197,8 +197,8 @@ extension ErrorCodeMacro.FixItMessage: SwiftDiagnostics.FixItMessage {
     var message: String {
         
         switch self {
-        case let .useLongerGeneratedCodes(currentLength):
-            "Specify a longer code length with \"@ErrorCode(codeLength: \(currentLength + 1))\""
+        case let .useLongerGeneratedCodes(currentLength, macroName):
+            "Specify a longer code length with \"@\(macroName)(codeLength: \(currentLength + 1))\""
             
         case .declareManualOpaqueCodes:
             "Declare opaque codes manually"

@@ -339,7 +339,7 @@ final class ErrorCode_NestedEnumTests: XCTestCase {
                 .init(
                     id: .init(
                         domain: "ErrorCodeMacro.CaseParsing",
-                        id: "tooManyAssociatedValues"
+                        id: "tooManyAssociatedValuesOnEnumCaseDeclaration"
                     ),
                     message: "\"@ErrorCode\" enum cases may only have up to one associated value, which must also be an \"ErrorCode\".",
                     line: 3,

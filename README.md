@@ -21,6 +21,8 @@ The main point of interaction with this package is the `@ErrorCode` macro. This 
 
 This protocol has two requirements, an `opaqueCode` property of type `String`, and an `init(opaqueCode: String)` initializer. These two functions are used to convert the adopting type into an opaque code `String`, and back again. The initializer can `throw` if no match can be found for the provided `opaqueCode`.
 
+There is also the `@ErrorCodeExtension` macro that can be applied to existing `enum` declarations on an extension, however this requires a little more work, and does not support nesting.
+
 The macro can be applied to an enum as simply as:
 
 ```swift
@@ -262,6 +264,11 @@ This function is used by the generated `init(opaqueCode: String)` initializer to
 This type contains a few errors used in the generated `init(opaqueCode: String)` initializer. It conforms to the `OpaqueCodeInitializerError` protocol which defines errors required by the generated initializer. You may want to manually declare this type if you wish to add your own errors. If you do so, and the generated initializer is being used, then your manual declaration will need to conform to the `OpaqueCodeInitializerError` in order to be used by the generated initializer. If the initializer is manually declared, then this type will not be generated or used, and any manual declaration of this type does not need to conform to `OpaqueCodeInitializerError`.
 
 All of the requirements for manual declarations should be enforced by compiler warnings and errors.
+
+## Extension macro
+It may be that you will want to add `ErrorCode` conformance to an existing `enum` not in your control. The standard `@ErrorCode` macro will not work in this case, as the macro cannot inspect the cases declared in order to generate any code, so they must be provided manually along with the `ErrorCode` conformance. The `@ErrorCodeExtension` can be used in this case, but a `static` `errorCodes` array of all cases must be provided for the macro to work off of.
+
+This macro does not support nesting, but provides the rest of the functionality of the `@ErrorCode` macro.
 
 ## TODO
 1. [x] Custom child code delimeter

@@ -1322,7 +1322,7 @@ final class ErrorCode_ManualOpaqueCodeInitializerTests: XCTestCase {
                         domain: "ErrorCodeMacro.ManualOpaqueCodeInitializerDeclarationValidation",
                         id: "incorrectAsyncDeclaration"
                     ),
-                    message: "Declaration is declared as \"async\" and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by \"@ErrorCode\".\n\nTo silence this warning, move this initializer in to an extension of this type.",
+                    message: "Declaration is declared as \"async\" and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by the macro.\n\nTo silence this warning, move this initializer in to an extension of this type.",
                     line: 6,
                     column: 5,
                     severity: .warning
@@ -1407,7 +1407,7 @@ final class ErrorCode_ManualOpaqueCodeInitializerTests: XCTestCase {
                         domain: "ErrorCodeMacro.ManualOpaqueCodeInitializerDeclarationValidation",
                         id: "incorrectAsyncDeclaration"
                     ),
-                    message: "Declaration is declared as \"async\" and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by \"@ErrorCode\".\n\nTo silence this warning, move this initializer in to an extension of this type.",
+                    message: "Declaration is declared as \"async\" and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by the macro.\n\nTo silence this warning, move this initializer in to an extension of this type.",
                     line: 6,
                     column: 5,
                     severity: .warning
@@ -1540,7 +1540,7 @@ final class ErrorCode_ManualOpaqueCodeInitializerTests: XCTestCase {
                         domain: "ErrorCodeMacro.ManualOpaqueCodeInitializerDeclarationValidation",
                         id: "incorrectParameterName"
                     ),
-                    message: "Declaration has incorrect parameter name and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by \"@ErrorCode\".\n\nTo silence this warning, move this initializer in to an extension of this type.",
+                    message: "Declaration has incorrect parameter name and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by the macro.\n\nTo silence this warning, move this initializer in to an extension of this type.",
                     line: 6,
                     column: 5,
                     severity: .warning
@@ -1625,7 +1625,7 @@ final class ErrorCode_ManualOpaqueCodeInitializerTests: XCTestCase {
                         domain: "ErrorCodeMacro.ManualOpaqueCodeInitializerDeclarationValidation",
                         id: "incorrectParameterType"
                     ),
-                    message: "Declaration has incorrect parameter type and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by \"@ErrorCode\".\n\nTo silence this warning, move this initializer in to an extension of this type.",
+                    message: "Declaration has incorrect parameter type and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by the macro.\n\nTo silence this warning, move this initializer in to an extension of this type.",
                     line: 6,
                     column: 5,
                     severity: .warning
@@ -1829,7 +1829,7 @@ final class ErrorCode_ManualOpaqueCodeInitializerTests: XCTestCase {
                         domain: "ErrorCodeMacro.ManualOpaqueCodeInitializerDeclarationValidation",
                         id: "incorrectAsyncDeclaration"
                     ),
-                    message: "Declaration is declared as \"async\" and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by \"@ErrorCode\".\n\nTo silence this warning, move this initializer in to an extension of this type.",
+                    message: "Declaration is declared as \"async\" and does not satisfy \"ErrorCode\" protocol requirement. The default \"init(opaqueCode: _)\" initializer will still be generated and used by the macro.\n\nTo silence this warning, move this initializer in to an extension of this type.",
                     line: 6,
                     column: 5,
                     severity: .warning

@@ -5,7 +5,7 @@ import SwiftDiagnostics
 extension ErrorCodeMacro {
     
     static func shouldGenerateOpaqueCodeErrors(
-        from declaration: EnumDeclSyntax,
+        from declaration: some DeclGroupSyntax,
         isGeneratingOpaqueCodeInitializer: Bool,
         context: some MacroExpansionContext
     ) -> Bool {
@@ -29,7 +29,7 @@ extension ErrorCodeMacro {
         return false
     }
     
-    private static func extractManualOpaqueCodeErrorDeclaration(from declaration: EnumDeclSyntax) -> DeclGroupSyntax? {
+    private static func extractManualOpaqueCodeErrorDeclaration(from declaration: some DeclGroupSyntax) -> DeclGroupSyntax? {
         
         if
             let enumDeclaration = declaration.memberBlock.members

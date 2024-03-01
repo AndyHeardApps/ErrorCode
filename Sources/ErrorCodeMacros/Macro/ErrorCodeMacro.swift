@@ -9,6 +9,159 @@ public struct ErrorCodeMacro {}
 // MARK: - Constants
 extension ErrorCodeMacro {}
 
+// MARK: - Member macro
+extension ErrorCodeMacro: MemberMacro {
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingMembersOf declaration: some DeclGroupSyntax,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+       
+        guard node.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "ErrorCodeExtension" else {
+            return []
+        }
+
+        guard let extensionDeclaration = declaration.as(ExtensionDeclSyntax.self) else {
+            throw DiagnosticsError(diagnostics: [
+                .init(
+                    node: declaration,
+                    message: DiagnosticMessage.notAnExtension
+                )
+            ])
+        }
+        
+        if inheritanceClause(syntax: extensionDeclaration.inheritanceClause) != nil {
+            var fixItDeclaration = extensionDeclaration
+            if fixItDeclaration.inheritanceClause == nil {
+                fixItDeclaration.inheritanceClause = .init(inheritedTypes: [])
+            }
+            fixItDeclaration.extendedType = fixItDeclaration.extendedType.trimmed
+            fixItDeclaration.inheritanceClause = fixItDeclaration.inheritanceClause?.trimmed
+            if !fixItDeclaration.inheritanceClause!.inheritedTypes.isEmpty {
+                let lastIndex = fixItDeclaration.inheritanceClause!.inheritedTypes.indices.last!
+                fixItDeclaration.inheritanceClause!.inheritedTypes[lastIndex].trailingComma = .commaToken()
+            }
+            fixItDeclaration.inheritanceClause?.inheritedTypes.append(
+                .init(
+                    leadingTrivia: .space,
+                    type: IdentifierTypeSyntax(name: "ErrorCode"),
+                    trailingTrivia: .space
+                )
+            )
+
+            context.diagnose(
+                .init(
+                    node: declaration,
+                    message: DiagnosticMessage.extensionDoesNotAddErrorCodeConformance,
+                    fixIt: .replace(
+                        message: FixItMessage.addErrorCodeConformance,
+                        oldNode: declaration,
+                        newNode: fixItDeclaration
+                    )
+                )
+            )
+        }
+        
+        let (opaqueCodeLengthIsDeclaredManually, opaqueCodeLength) = parseCustomOpaqueCodeLength(
+            from: node,
+            context: context
+        )
+        let (opaqueCodeCharactersIsDeclaredManually, opaqueCodeCharacters) = parseCustomOpaqueCodeCharacters(
+            from: node,
+            context: context
+        )
+        let enumCases = try parseEnumCases(
+            on: extensionDeclaration,
+            opaqueCodeLength: opaqueCodeLength,
+            opaqueCodeCharacters: opaqueCodeCharacters,
+            context: context
+        )
+        
+        let accessScopeModifier = extensionDeclaration.modifiers.first(where: \.isNeededAccessLevelModifier)?.minimumProtocolWitnessVisibilityForAccessModifier ?? .keyword(.public)
+        
+        let shouldGenerateOpaqueCodeStaticValues = try shouldGenerateOpaqueCodeStaticValues(
+            from: extensionDeclaration,
+            enumCases: enumCases
+        )
+        
+        let shouldGenerateOpaqueCodeProperty = try shouldGenerateOpaqueCodeProperty(
+            from: extensionDeclaration,
+            accessScopeModifier: accessScopeModifier
+        )
+                        
+        let shouldGenerateOpaqueCodeInitializer = try shouldGenerateOpaqueCodeInitializer(
+            from: extensionDeclaration,
+            accessScopeModifier: accessScopeModifier,
+            context: context
+        )
+        
+        let shouldGenerateOpaqueCodeErrors = shouldGenerateOpaqueCodeErrors(
+            from: extensionDeclaration,
+            isGeneratingOpaqueCodeInitializer: shouldGenerateOpaqueCodeInitializer,
+            context: context
+        )
+
+        var declarations: [DeclSyntax] = []
+        if shouldGenerateOpaqueCodeStaticValues {
+            try declarations.append(
+                generatedOpaqueCodeStaticValues(
+                    of: node,
+                    attachedTo: extensionDeclaration,
+                    with: enumCases,
+                    definingOpaqueCodeLength: opaqueCodeLength,
+                    context: context
+                )
+            )
+        }
+
+        if shouldGenerateOpaqueCodeProperty {
+            try declarations.append(
+                generatedOpaqueCodeProperty(
+                    for: enumCases,
+                    accessScopeModifier: accessScopeModifier,
+                    childCodeDelimiter: ""
+                )
+            )
+        }
+        
+        if shouldGenerateOpaqueCodeInitializer {
+            try declarations.append(
+                generatedOpaqueCodeInitializer(
+                    for: enumCases,
+                    accessScopeModifier: accessScopeModifier,
+                    childCodeDelimiter: ""
+                )
+            )
+        }
+
+        if shouldGenerateOpaqueCodeErrors {
+            declarations.append(
+                generatedOpaqueCodeErrors()
+            )
+        }
+        
+        if opaqueCodeLengthIsDeclaredManually && !shouldGenerateOpaqueCodeStaticValues {
+            context.diagnose(
+                .init(
+                    node: node,
+                    message: DiagnosticMessage.customOpaqueCodeLengthDeclaredAlongsideManualOpaqueCodeStaticValues
+                )
+            )
+        }
+        
+        if opaqueCodeCharactersIsDeclaredManually && !shouldGenerateOpaqueCodeStaticValues {
+            context.diagnose(
+                .init(
+                    node: node,
+                    message: DiagnosticMessage.customOpaqueCodeCharactersDeclaredAlongsideManualOpaqueCodeStaticValues
+                )
+            )
+        }
+        
+        return declarations
+    }
+}
+
 // MARK: - Extension macro
 extension ErrorCodeMacro: ExtensionMacro {
     
@@ -19,6 +172,10 @@ extension ErrorCodeMacro: ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
+        
+        guard node.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "ErrorCode" else {
+            return []
+        }
         
         guard let enumDeclaration = declaration.as(EnumDeclSyntax.self) else {
             throw DiagnosticsError(diagnostics: [
@@ -49,37 +206,37 @@ extension ErrorCodeMacro: ExtensionMacro {
         let accessScopeModifier = declaration.modifiers.first(where: \.isNeededAccessLevelModifier)?.minimumProtocolWitnessVisibilityForAccessModifier
         
         let shouldGenerateOpaqueCodeStaticValues = try shouldGenerateOpaqueCodeStaticValues(
-            from: enumDeclaration,
+            from: declaration,
             enumCases: enumCases
         )
         
         let shouldGenerateOpaqueCodeProperty = try shouldGenerateOpaqueCodeProperty(
-            from: enumDeclaration,
+            from: declaration,
             accessScopeModifier: accessScopeModifier
         )
         
         let shouldGenerateChildOpaqueCodeFunction = try shouldGenerateChildOpaqueCodeFunction(
-            from: enumDeclaration,
+            from: declaration,
             with: enumCases,
             isGeneratingOpaqueCodeProperty: shouldGenerateOpaqueCodeProperty,
             context: context
         )
                 
         let shouldGenerateOpaqueCodeInitializer = try shouldGenerateOpaqueCodeInitializer(
-            from: enumDeclaration,
+            from: declaration,
             accessScopeModifier: accessScopeModifier,
             context: context
         )
         
         let shouldGenerateChildErrorCodeFunction = shouldGenerateChildErrorCodeFunction(
-            from: enumDeclaration,
+            from: declaration,
             with: enumCases,
             isGeneratingOpaqueCodeInitializer: shouldGenerateOpaqueCodeInitializer,
             context: context
         )
         
         let shouldGenerateOpaqueCodeErrors = shouldGenerateOpaqueCodeErrors(
-            from: enumDeclaration,
+            from: declaration,
             isGeneratingOpaqueCodeInitializer: shouldGenerateOpaqueCodeInitializer,
             context: context
         )
@@ -92,7 +249,7 @@ extension ErrorCodeMacro: ExtensionMacro {
                     if shouldGenerateOpaqueCodeStaticValues {
                         try generatedOpaqueCodeStaticValues(
                             of: node,
-                            attachedTo: enumDeclaration,
+                            attachedTo: declaration,
                             with: enumCases,
                             definingOpaqueCodeLength: opaqueCodeLength,
                             context: context
@@ -202,6 +359,8 @@ extension ErrorCodeMacro {
     fileprivate enum DiagnosticMessage {
         
         case notAnEnum
+        case notAnExtension
+        case extensionDoesNotAddErrorCodeConformance
         case customOpaqueCodeLengthDeclaredAlongsideManualOpaqueCodeStaticValues
         case customOpaqueCodeCharactersDeclaredAlongsideManualOpaqueCodeStaticValues
         case customOpaqueCodeDelimiterDeclaredAlongsideManualInitializerAndProperty
@@ -216,6 +375,12 @@ extension ErrorCodeMacro.DiagnosticMessage: SwiftDiagnostics.DiagnosticMessage {
         switch self {
         case .notAnEnum:
             "Macro \"@ErrorCode\" can only be applied to an enum."
+            
+        case .notAnExtension:
+            "Macro \"@ErrorCodeExtension\" can only be applied to an extension of an enum."
+
+        case .extensionDoesNotAddErrorCodeConformance:
+            "Macro \"@ErrorCodeExtension\" is a member macro and can not automatically add \"ErrorCode\" conformance."
             
         case .customOpaqueCodeLengthDeclaredAlongsideManualOpaqueCodeStaticValues:
             "\"OpaqueCode\" values are declared manually, so the \"codeLength\" parameter will be ignored."
@@ -237,6 +402,12 @@ extension ErrorCodeMacro.DiagnosticMessage: SwiftDiagnostics.DiagnosticMessage {
         switch self {
         case .notAnEnum:
             "notAnEnum"
+            
+        case .notAnExtension:
+            "notAnExtension"
+            
+        case .extensionDoesNotAddErrorCodeConformance:
+            "extensionDoesNotAddErrorCodeConformance"
             
         case .customOpaqueCodeLengthDeclaredAlongsideManualOpaqueCodeStaticValues:
             "customOpaqueCodeLengthDeclaredAlongsideManualOpaqueCodeStaticValues"
@@ -264,12 +435,49 @@ extension ErrorCodeMacro.DiagnosticMessage: SwiftDiagnostics.DiagnosticMessage {
     var severity: DiagnosticSeverity {
         
         switch self {
-        case .notAnEnum:
+        case .notAnEnum, .notAnExtension:
             .error
             
-        case .customOpaqueCodeLengthDeclaredAlongsideManualOpaqueCodeStaticValues, .customOpaqueCodeCharactersDeclaredAlongsideManualOpaqueCodeStaticValues, .customOpaqueCodeDelimiterDeclaredAlongsideManualInitializerAndProperty, .customOpaqueCodeDelimiterDeclaredOnEnumWithNoChildren:
+        case .extensionDoesNotAddErrorCodeConformance, .customOpaqueCodeLengthDeclaredAlongsideManualOpaqueCodeStaticValues, .customOpaqueCodeCharactersDeclaredAlongsideManualOpaqueCodeStaticValues, .customOpaqueCodeDelimiterDeclaredAlongsideManualInitializerAndProperty, .customOpaqueCodeDelimiterDeclaredOnEnumWithNoChildren:
             .warning
             
         }
+    }
+}
+
+// MARK: - Fix it message
+extension ErrorCodeMacro {
+    fileprivate enum FixItMessage {
+        
+        case addErrorCodeConformance
+    }
+}
+
+extension ErrorCodeMacro.FixItMessage: SwiftDiagnostics.FixItMessage {
+    
+    var message: String {
+        
+        switch self {
+        case .addErrorCodeConformance:
+            "Add \"ErrorCode\" conformance"
+            
+        }
+    }
+    
+    private var messageID: String {
+    
+        switch self {
+        case .addErrorCodeConformance:
+            "addErrorCodeConformance"
+            
+        }
+    }
+    
+    var fixItID: SwiftDiagnostics.MessageID {
+        
+        .init(
+            domain: "ErrorCodeMacro",
+            id: messageID
+        )
     }
 }
