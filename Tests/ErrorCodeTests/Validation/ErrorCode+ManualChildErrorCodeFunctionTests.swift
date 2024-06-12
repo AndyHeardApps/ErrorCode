@@ -5,8 +5,7 @@ import XCTest
 final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
 
     // MARK: - Opaque code property
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualInitializerDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualInitializerDeclaration_isValid() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -50,16 +49,12 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
     // MARK: - Generic
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_isValid() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -134,15 +129,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_isValid_butNonThrowing() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_isValid_butNonThrowing() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -217,15 +208,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isValid_butAsync() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isValid_butAsync() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -316,15 +303,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isValid_butAsyncThrowing() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isValid_butAsyncThrowing() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -415,15 +398,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_hasIncorrectParameterCount() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_hasIncorrectParameterCount() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -502,15 +481,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectFunctionName() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectFunctionName() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -601,15 +576,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectGenericInheritanceType() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectGenericInheritanceType() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -700,15 +671,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualFGenericunctionDeclaration_hasIncorrectParameterName() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualFGenericunctionDeclaration_hasIncorrectParameterName() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -799,15 +766,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectParameterType() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectParameterType() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -898,16 +861,12 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
 
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectReturnType() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectReturnType() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -998,15 +957,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isNotStatic() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isNotStatic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1097,16 +1052,12 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
     // MARK: - Generic where clause
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_isValid() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1181,15 +1132,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_isValid_butNonThrowing() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_isValid_butNonThrowing() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1264,15 +1211,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isValid_butAsync() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isValid_butAsync() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1363,15 +1306,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isValid_butAsyncThrowing() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isValid_butAsyncThrowing() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1462,15 +1401,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterCount() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterCount() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1549,15 +1484,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectFunctionName() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectFunctionName() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1648,15 +1579,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectGenericInheritanceType() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectGenericInheritanceType() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1747,15 +1674,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterName() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterName() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1846,15 +1769,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterType() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterType() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1945,15 +1864,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectReturnType() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectReturnType() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -2044,15 +1959,11 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isNotStatic() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isNotStatic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -2143,10 +2054,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 }

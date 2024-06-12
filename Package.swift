@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -31,22 +31,31 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
-            ]
+            ],
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "ErrorCode",
-            dependencies: ["ErrorCodeMacros"]
+            dependencies: ["ErrorCodeMacros"],
+            swiftSettings: swiftSettings
         ),
         .executableTarget(
             name: "ErrorCodeClient",
-            dependencies: ["ErrorCode"]
+            dependencies: ["ErrorCode"],
+            swiftSettings: swiftSettings
         ),
         .testTarget(
             name: "ErrorCodeTests",
             dependencies: [
                 "ErrorCodeMacros",
                 .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")
-            ]
+            ],
+            swiftSettings: swiftSettings
         )
-    ]
+    ],
+    swiftLanguageVersions: [.v6]
 )
+
+var swiftSettings: [SwiftSetting] { [
+    .enableExperimentalFeature("StrictConcurrency"),
+] }

@@ -5,8 +5,7 @@ import XCTest
 final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
     
     // MARK: - Opaque code property
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_whenManualOpaqueCodePropertyDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_whenManualOpaqueCodePropertyDeclaration_isValid() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -62,16 +61,12 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
     // MARK: - Public error codes
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsPublic() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsPublic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -127,15 +122,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsPublic() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsPublic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -173,15 +164,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsPublic() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsPublic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -219,15 +206,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsPublic() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsPublic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -265,15 +248,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsPublic() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsPublic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -311,16 +290,12 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
     // MARK: - Internal error codes
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsInernal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsInernal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -376,15 +351,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -440,15 +411,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -504,15 +471,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -552,15 +515,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -600,16 +559,12 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
     // MARK: - Explicit internal error codes
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsExplicitInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsExplicitInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -665,15 +620,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsExplicitInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsExplicitInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -729,15 +680,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsExplicitInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsExplicitInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -793,15 +740,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsExplicitInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsExplicitInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -841,15 +784,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsExplicitInternal() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsExplicitInternal() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -889,16 +828,12 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
     // MARK: - File private error codes
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsFilePrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsFilePrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -954,15 +889,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsFilePrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsFilePrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1018,15 +949,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsFilePrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsFilePrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1082,15 +1009,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsFilePrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsFilePrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1146,15 +1069,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsFilePrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsFilePrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1195,16 +1114,12 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
     // MARK: - Private error codes
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsPrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsPublic_andContainingEnumIsPrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1260,15 +1175,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsPrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsInternal_andContainingEnumIsPrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1324,15 +1235,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsPrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsExplicitInternal_andContainingEnumIsPrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1388,15 +1295,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsPrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillNotGenerateError_whenManualOpaqueCodePropertyDeclarationIsFilePrivate_andContainingEnumIsPrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1452,15 +1355,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsPrivate() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclarationIsPrivate_andContainingEnumIsPrivate() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1501,16 +1400,12 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
     // MARK: - Property type
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclaration_hasIncorrectPropertyType() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclaration_hasIncorrectPropertyType() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1548,16 +1443,12 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
     // MARK: - Effect modifiers
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclaration_isValid_butHasAsyncGetter() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclaration_isValid_butHasAsyncGetter() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1599,15 +1490,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclaration_isValid_butHasThrowingGetter() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclaration_isValid_butHasThrowingGetter() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1649,15 +1536,11 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclaration_isValid_butHasAsyncThrowingGetter() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeProperty_andWillGenerateError_whenManualOpaqueCodePropertyDeclaration_isValid_butHasAsyncThrowingGetter() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -1699,10 +1582,7 @@ final class ErrorCode_ManualOpaqueCodePropertyTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 }

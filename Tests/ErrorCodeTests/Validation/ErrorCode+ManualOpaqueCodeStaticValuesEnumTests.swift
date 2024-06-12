@@ -4,8 +4,7 @@ import XCTest
 
 final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
     
-    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asEnum() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asEnum() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -67,15 +66,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asStruct() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asStruct() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -137,15 +132,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asClass() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asClass() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -207,15 +198,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asActor() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asActor() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -277,15 +264,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenNamingCollisionExists_butIsPropertyDeclaration() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenNamingCollisionExists_butIsPropertyDeclaration() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -320,15 +303,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                     severity: .error
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateOpaqueCode_andWillNotGenerateError_whenNamingCollisionExists_butIsStaticPropertyDeclaration() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willGenerateOpaqueCode_andWillNotGenerateError_whenNamingCollisionExists_butIsStaticPropertyDeclaration() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -393,15 +372,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenNamingCollisionExists_butIsFunctionDeclaration() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenNamingCollisionExists_butIsFunctionDeclaration() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -432,15 +407,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                     severity: .error
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isMissingCase() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isMissingCase() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -480,15 +451,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsStatic() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsStatic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -524,15 +491,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsLet() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsLet() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -568,15 +531,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsStringLiteral() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsStringLiteral() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -609,15 +568,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                     severity: .error
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenDuplicateOpaqueCodesExist() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenDuplicateOpaqueCodesExist() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -664,15 +619,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                     severity: .error
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willIgnoreUnrelatedDeclarations() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willIgnoreUnrelatedDeclarations() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -740,15 +691,11 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_hasNoInitializer() throws {
-        #if canImport(ErrorCodeMacros)
+    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_hasNoInitializer() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -785,10 +732,7 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
                     severity: .error
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 }

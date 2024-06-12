@@ -1,11 +1,16 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_NestedEnumTests: XCTestCase {
+@Suite(
+    "Nested enum expansion",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeGeneration)
+)
+struct ErrorCodeNestedEnumTests {
 
-    func testErrorCode_willExpandUnnamedNestedEnumCorrectly() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Un-named nested")
+    func unnamedNested() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -128,15 +133,12 @@ final class ErrorCode_NestedEnumTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willExpandNamedNestedEnumCorrectly() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Named nested values")
+    func namedNestedValues() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -259,15 +261,12 @@ final class ErrorCode_NestedEnumTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateError_forEnumCaseWithTooManyAssociatedValues() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Error for cases with too many associated values")
+    func errorForCasesWithTooManyAssociatedValues() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -347,10 +346,7 @@ final class ErrorCode_NestedEnumTests: XCTestCase {
                     severity: .error
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 }

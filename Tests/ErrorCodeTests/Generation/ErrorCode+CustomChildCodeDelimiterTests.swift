@@ -1,11 +1,16 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_CustomChildCodeDelimiterTests: XCTestCase {
+@Suite(
+    "Custom child delimiter",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeGeneration)
+)
+struct ErrorCodeCustomChildCodeDelimiterTests {
 
-    func testErrorCode_willRespectCustomChildCodeDelimiter() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Respects custom value")
+    func respectsCustomValue() {
         assertMacroExpansion(
             """
             @ErrorCode(delimiter: ".")
@@ -76,15 +81,12 @@ final class ErrorCode_CustomChildCodeDelimiterTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomChildCodeDelimiter_isProvidedAsExpression() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and use default value when provided as expression")
+    func warningAndUseDefaultValueWhenProvidedAsExpression() {
         assertMacroExpansion(
             """
             @ErrorCode(delimiter: "-" + "-")
@@ -167,15 +169,12 @@ final class ErrorCode_CustomChildCodeDelimiterTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomChildCodeDelimiter_isProvidedAsFunction() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and use default value when provided as function")
+    func warningAndUseDefaultValueWhenProvidedAsFunction() {
         assertMacroExpansion(
             """
             @ErrorCode(delimiter: delimiter())
@@ -258,15 +257,12 @@ final class ErrorCode_CustomChildCodeDelimiterTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomChildCodeDelimiter_isProvidedAsNonStringLiteral() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and use default value when provided as non string literal")
+    func warningAndUseDefaultValueWhenProvidedAsNonStringLiteral() {
         assertMacroExpansion(
             """
             @ErrorCode(delimiter: 1)
@@ -349,15 +345,12 @@ final class ErrorCode_CustomChildCodeDelimiterTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomChildCodeDelimiter_isProvidedAsEmptyStringLiteral() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and user default value when provided as empty string literal")
+    func warningAndUserDefaultValueWhenProvidedAsEmptyStringLiteral() {
         assertMacroExpansion(
             """
             @ErrorCode(delimiter: "")
@@ -440,10 +433,7 @@ final class ErrorCode_CustomChildCodeDelimiterTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 }
