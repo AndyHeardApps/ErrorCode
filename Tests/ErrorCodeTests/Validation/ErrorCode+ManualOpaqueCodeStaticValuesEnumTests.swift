@@ -1,10 +1,16 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
+@Suite(
+    "Manual OpaqueCode values",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeValidation)
+)
+struct ErrorCodeManualCodeStaticValuesEnumTests {
     
-    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asEnum() {
+    @Test("Don't generate when manually declared as enum")
+    func dontGenerateWhenManuallyDeclaredAsEnum() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -70,7 +76,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asStruct() {
+    @Test("Don't generate when manually declared as struct")
+    func dontGenerateWhenManuallyDeclaredAsStruct() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -136,7 +143,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asClass() {
+    @Test("Don't generate when manually declared as class")
+    func dontGenerateWhenManuallyDeclaredAsClass() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -202,7 +210,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
 
-    func testErrorCode_willNotGenerateOpaqueCodeValues_andWillNotGenerateError_whenManuallyDeclared_asActor() {
+    @Test("Don't generate when manually declared as actor")
+    func dontGenerateWhenManuallyDeclaredAsActor() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -268,7 +277,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
 
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenNamingCollisionExists_butIsPropertyDeclaration() {
+    @Test("Error and don't generate when naming collesion exists as property")
+    func errorAndDontGenerateWhenNamingCollesionExistsAsProperty() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -307,7 +317,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willGenerateOpaqueCode_andWillNotGenerateError_whenNamingCollisionExists_butIsStaticPropertyDeclaration() {
+    @Test("No error and generate when naming collesion exists as static property")
+    func noErrorAndGenerateWhenNamingCollesionExistsAsStaticProperty() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -376,7 +387,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenNamingCollisionExists_butIsFunctionDeclaration() {
+    @Test("Error and don't generate when naming collesion exists as function")
+    func errorAndDontGenerateWhenNamingCollesionExistsAsFunction() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -411,7 +423,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isMissingCase() {
+    @Test("Error and don't generate when case is missing")
+    func errorAndDontGenerateWhenCaseIsMissing() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -455,7 +468,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
 
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsStatic() {
+    @Test("Error and don't generate when case not declared as static")
+    func errorAndDontGenerateWhenCaseNotDeclaredAsStatic() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -495,7 +509,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsLet() {
+    @Test("Error and don't generate when case not declared as let")
+    func errorAndDontGenerateWhenCaseNotDeclaredAsLet() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -535,7 +550,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
 
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_isNotDeclaredAsStringLiteral() {
+    @Test("Error and don't generate when case not declared as string literal")
+    func errorAndDontGenerateWhenCaseNotDeclaredAsStringLiteral() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -572,7 +588,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenDuplicateOpaqueCodesExist() {
+    @Test("Error and don't generate when duplicate opaqueCode values are declared")
+    func errorAndDontGenerateWhenDuplicateOpaqueCodeValuesAreDeclared() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -623,7 +640,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willIgnoreUnrelatedDeclarations() {
+    @Test("Ignore unrelated declarations")
+    func ignoreUnrelatedDeclarations() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -695,7 +713,8 @@ final class ErrorCode_ManualCodeStaticValuesEnumTests: XCTestCase {
         )
     }
     
-    func testErrorCode_willNotGenerateOpaqueCode_andWillGenerateError_whenOpaqueCode_hasNoInitializer() {
+    @Test("Error and don't generate when case has no initializer")
+    func errorAndDontGenerateWhenCaseHasNoInitializer() {
         assertMacroExpansion(
             """
             @ErrorCode

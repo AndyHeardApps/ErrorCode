@@ -1,8 +1,13 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_ManualChildOpaqueCodeFunctionTests: XCTestCase {
+@Suite(
+    "Manual childOpaqueCode function declaration",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeValidation)
+)
+struct ErrorCodeManualChildOpaqueCodeFunctionTests {
     
     // MARK: - Child Opaque code function
     func testErrorCode_willNotGenerateChildOpaqueCodeFunction_whenManualChildOpaqueCodeFunctionDeclaration_isValid() {
@@ -4304,5 +4309,4 @@ final class ErrorCode_ManualChildOpaqueCodeFunctionTests: XCTestCase {
             macros: MacroTesting.shared.testMacros
         )
     }
-
 }
