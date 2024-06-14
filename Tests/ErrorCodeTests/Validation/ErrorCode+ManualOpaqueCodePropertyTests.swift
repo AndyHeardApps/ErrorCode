@@ -11,7 +11,7 @@ struct ErrorCodeManualOpaqueCodePropertyTests {
     
     // MARK: - Opaque code property
     @Test("Don't generate if valid property is manually declared")
-    func dontGenerateIfValidInitializerIsManuallyDeclared() {
+    func dontGenerateIfValidPropertyIsManuallyDeclared() {
         assertMacroExpansion(
             """
             @ErrorCode

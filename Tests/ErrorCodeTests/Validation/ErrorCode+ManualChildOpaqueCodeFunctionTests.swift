@@ -8,81 +8,14 @@ import Testing
     .tags(.codeValidation)
 )
 struct ErrorCodeManualChildOpaqueCodeFunctionTests {
-    
-    // MARK: - Child Opaque code function
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_whenManualChildOpaqueCodeFunctionDeclaration_isValid() {
-        assertMacroExpansion(
-            """
-            @ErrorCode
-            enum TestCode {
-                case value1(Child)
-                case value2
 
-                var opaqueCode: String {
-                    ""
-                }
-            }
-            """,
-            expandedSource: """
-            enum TestCode {
-                case value1(Child)
-                case value2
-
-                var opaqueCode: String {
-                    ""
-                }
-            }
-            
-            extension TestCode: ErrorCode {
-
-                private enum OpaqueCode {
-                    static let value1 = "liBc"
-                    static let value2 = "M7aD"
-                }
-
-                init(opaqueCode: String) throws {
-
-                    var components = opaqueCode.split(separator: "-")
-                    guard components.isEmpty == false else {
-                        throw OpaqueCodeError.opaqueCodeIsEmpty
-                    }
-
-                    let firstComponent = components.removeFirst()
-                    switch firstComponent {
-                    case OpaqueCode.value1:
-                        let remainingComponents = components.joined(separator: "-")
-                        self = try .value1(Self.childErrorCode(for: remainingComponents))
-
-                    case OpaqueCode.value2:
-                        guard components.isEmpty else {
-                            throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
-                        }
-                        self = .value2
-
-                    default:
-                        throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
-                    }
-                }
-            
-                private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
-                    try E(opaqueCode: opaqueCode)
-                }
-
-                private enum OpaqueCodeError: OpaqueCodeInitializerError {
-                    case opaqueCodeIsEmpty
-                    case unrecognizedOpaqueCode(String)
-                    case unusedOpaqueCodeComponents([String])
-                }
-            }
-            """,
-            macros: MacroTesting.shared.testMacros
-        )
-    }
-    
     // MARK: - Existential
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_whenManualExistentialFunctionDeclaration_isValid() {
-        assertMacroExpansion(
+    @Suite("Existential")
+    struct Existential {
+
+        @Test("Don't generate if valid function is manually declared")
+        func dontGenerateIfValidFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -103,14 +36,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -119,7 +52,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -144,7 +77,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -157,11 +90,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_andWillGenerateError_whenManualExistentialFunctionDeclaration_isValid_butThrowing() {
-        assertMacroExpansion(
+        @Test("Error and don't generate for throwing function")
+        func errorAndDontGenerateForThrowingFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -182,14 +116,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -198,7 +132,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -223,7 +157,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -251,11 +185,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialFunctionDeclaration_isValid_butAsync() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for async function")
+        func warningAndGenerateForAsyncFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -276,14 +211,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -292,11 +227,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -321,7 +256,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -346,11 +281,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialFunctionDeclaration_isValid_butAsyncThrowing() {
-        assertMacroExpansion(
+        @Test("Warning and generate for async throwing function")
+        func warningAndGenerateForAsyncThrowing() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -371,14 +307,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -387,11 +323,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -416,7 +352,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -441,11 +377,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_whenManualExistentialFunctionDeclaration_hasIncorrectParameterCount() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Generate for incorrect parameter count")
+        func generateForIncorrectParameterCount() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -466,14 +403,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -482,11 +419,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -511,7 +448,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -524,11 +461,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialFunctionDeclaration_hasIncorrectFunctionName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect function name")
+        func warningAndGenerateForIncorrectFunctionName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -549,14 +487,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -565,11 +503,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -594,7 +532,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -619,11 +557,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialFunctionDeclaration_hasIncorrectParameterName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect parameter name")
+        func warningAndGenerateForIncorrectParameterName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -644,14 +583,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -660,11 +599,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -689,7 +628,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -714,11 +653,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialFunctionDeclaration_hasIncorrectParameterType() {
-        assertMacroExpansion(
+        @Test("Warning and generate for incorrect parameter type")
+        func warningAndGenerateForIncorrectParameterType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -739,14 +679,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -755,11 +695,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -784,7 +724,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -809,11 +749,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialFunctionDeclaration_hasIncorrectReturnType() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect return type")
+        func warningAndGenerateForIncorrectReturnType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -834,14 +775,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -850,11 +791,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -879,7 +820,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -904,12 +845,20 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
+            )
+        }
     }
+}
 
-    // MARK: - Existential any
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_whenManualExistentialAnyFunctionDeclaration_isValid() {
-        assertMacroExpansion(
+// MARK: - Existential any
+extension ErrorCodeManualChildOpaqueCodeFunctionTests {
+
+    @Suite("Existential any")
+    struct ExistentialAny {
+
+        @Test("Don't generate if valid function is manually declared")
+        func dontGenerateIfValidFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -930,14 +879,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -946,7 +895,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -971,7 +920,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -984,11 +933,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_andWillGenerateError_whenManualExistentialAnyFunctionDeclaration_isValid_butThrowing() {
-        assertMacroExpansion(
+        @Test("Error and don't generate for throwing function")
+        func errorAndDontGenerateForThrowingFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1009,14 +959,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1025,7 +975,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1050,7 +1000,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1078,11 +1028,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialAnyFunctionDeclaration_isValid_butAsync() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for async function")
+        func warningAndGenerateForAsyncFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1103,14 +1054,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1119,11 +1070,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1148,7 +1099,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1173,11 +1124,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialAnyFunctionDeclaration_isValid_butAsyncThrowing() {
-        assertMacroExpansion(
+        @Test("Warning and generate for async throwing function")
+        func warningAndGenerateForAsyncThrowing() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1198,14 +1150,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1214,11 +1166,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1243,7 +1195,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1268,11 +1220,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_whenManualExistentialAnyFunctionDeclaration_hasIncorrectParameterCount() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Generate for incorrect parameter count")
+        func generateForIncorrectParameterCount() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1293,14 +1246,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1309,11 +1262,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1338,7 +1291,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1351,11 +1304,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialAnyFunctionDeclaration_hasIncorrectFunctionName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect function name")
+        func warningAndGenerateForIncorrectFunctionName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1376,14 +1330,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1392,11 +1346,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1421,7 +1375,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1446,11 +1400,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialAnyFunctionDeclaration_hasIncorrectParameterName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect parameter name")
+        func warningAndGenerateForIncorrectParameterName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1471,14 +1426,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1487,11 +1442,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1516,7 +1471,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1541,11 +1496,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialAnyFunctionDeclaration_hasIncorrectParameterType() {
-        assertMacroExpansion(
+        @Test("Warning and generate for incorrect parameter type")
+        func warningAndGenerateForIncorrectParameterType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1566,14 +1522,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1582,11 +1538,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1611,7 +1567,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1636,11 +1592,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualExistentialAnyFunctionDeclaration_hasIncorrectReturnType() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect return type")
+        func warningAndGenerateForIncorrectReturnType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1661,14 +1618,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1677,11 +1634,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1706,7 +1663,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1731,12 +1688,20 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
+            )
+        }
     }
-    
-    // MARK: - Generic
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_whenManualGenericFunctionDeclaration_isValid() {
-        assertMacroExpansion(
+}
+
+// MARK: - Generic
+extension ErrorCodeManualChildOpaqueCodeFunctionTests {
+
+    @Suite("Generic")
+    struct Generic {
+
+        @Test("Don't generate if valid function is manually declared")
+        func dontGenerateIfValidFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1757,14 +1722,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1773,7 +1738,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1798,7 +1763,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1811,11 +1776,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_andWillGenerateError_whenManualGenericFunctionDeclaration_isValid_butThrowing() {
-        assertMacroExpansion(
+        @Test("Error and don't generate for throwing function")
+        func errorAndDontGenerateForThrowingFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1836,14 +1802,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1852,7 +1818,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1877,7 +1843,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1905,11 +1871,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isValid_butAsync() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for async function")
+        func warningAndGenerateForAsyncFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1930,14 +1897,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -1946,11 +1913,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -1975,7 +1942,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2000,11 +1967,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isValid_butAsyncThrowing() {
-        assertMacroExpansion(
+        @Test("Warning and generate for async throwing function")
+        func warningAndGenerateForAsyncThrowing() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2025,14 +1993,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2041,11 +2009,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2070,7 +2038,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2095,11 +2063,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_whenManualExistentialGenericDeclaration_hasIncorrectParameterCount() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Generate for incorrect parameter count")
+        func generateForIncorrectParameterCount() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2120,14 +2089,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2136,11 +2105,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2165,7 +2134,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2178,11 +2147,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectFunctionName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect function name")
+        func warningAndGenerateForIncorrectFunctionName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2203,14 +2173,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2219,11 +2189,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2248,7 +2218,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2273,11 +2243,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectParameterName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect parameter name")
+        func warningAndGenerateForIncorrectParameterName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2298,14 +2269,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2314,11 +2285,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2343,7 +2314,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2368,11 +2339,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectGenericParameterType() {
-        assertMacroExpansion(
+        @Test("Warning and generate for incorrect parameter type")
+        func warningAndGenerateForIncorrectParameterType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2393,14 +2365,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2409,11 +2381,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2438,7 +2410,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2463,11 +2435,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectReturnType() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect return type")
+        func warningAndGenerateForIncorrectReturnType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2488,14 +2461,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2504,11 +2477,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2533,7 +2506,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2558,12 +2531,20 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
+            )
+        }
     }
-    
-    // MARK: - Generic where
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_whenManualGenericWhereFunctionDeclaration_isValid() {
-        assertMacroExpansion(
+}
+
+// MARK: - Generic where
+extension ErrorCodeManualChildOpaqueCodeFunctionTests {
+
+    @Suite("Generic where")
+    struct GenericWhere {
+
+        @Test("Don't generate if valid function is manually declared")
+        func dontGenerateIfValidFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2584,14 +2565,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2600,7 +2581,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2625,7 +2606,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2638,11 +2619,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_andWillGenerateError_whenManualGenericWhereFunctionDeclaration_isValid_butThrowing() {
-        assertMacroExpansion(
+        @Test("Error and don't generate for throwing function")
+        func errorAndDontGenerateForThrowingFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2663,14 +2645,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2679,7 +2661,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2704,7 +2686,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2732,11 +2714,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isValid_butAsync() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for async function")
+        func warningAndGenerateForAsyncFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2757,14 +2740,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2773,11 +2756,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2802,7 +2785,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2827,11 +2810,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isValid_butAsyncThrowing() {
-        assertMacroExpansion(
+        @Test("Warning and generate for async throwing function")
+        func warningAndGenerateForAsyncThrowing() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2852,14 +2836,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2868,11 +2852,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2897,7 +2881,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2922,11 +2906,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_whenManualExistentialGenericWhereDeclaration_hasIncorrectParameterCount() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Generate for incorrect parameter count")
+        func generateForIncorrectParameterCount() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -2947,14 +2932,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -2963,11 +2948,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -2992,7 +2977,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3005,11 +2990,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectFunctionName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect function name")
+        func warningAndGenerateForIncorrectFunctionName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3030,14 +3016,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3046,11 +3032,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3075,7 +3061,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3100,11 +3086,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect parameter name")
+        func warningAndGenerateForIncorrectParameterName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3125,14 +3112,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3141,11 +3128,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3170,7 +3157,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3195,11 +3182,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectGenericWhereParameterName() {
-        assertMacroExpansion(
+        @Test("Warning and generate for incorrect generic parameter name")
+        func warningAndGenerateForIncorrectGenericParameterName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3220,14 +3208,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3236,11 +3224,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3265,7 +3253,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3290,11 +3278,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectGenericWhereParameterType() {
-        assertMacroExpansion(
+        @Test("Warning and generate for incorrect parameter type")
+        func warningAndGenerateForIncorrectParameterType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3315,14 +3304,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3331,11 +3320,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3360,7 +3349,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3385,11 +3374,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectReturnType() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect return type")
+        func warningAndGenerateForIncorrectReturnType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3410,14 +3400,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3426,11 +3416,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3455,7 +3445,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3480,12 +3470,20 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
+            )
+        }
     }
-    
-    // MARK: - Generic some
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_whenManualGenericSomeFunctionDeclaration_isValid() {
-        assertMacroExpansion(
+}
+
+// MARK: - Generic some
+extension ErrorCodeManualChildOpaqueCodeFunctionTests {
+
+    @Suite("Generic some")
+    struct GenericSome {
+
+        @Test("Don't generate if valid function is manually declared")
+        func dontGenerateIfValidFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3506,14 +3504,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3522,7 +3520,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3547,7 +3545,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3560,11 +3558,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willNotGenerateChildOpaqueCodeFunction_andWillGenerateError_whenManualGenericSomeFunctionDeclaration_isValid_butThrowing() {
-        assertMacroExpansion(
+        @Test("Error and don't generate for throwing function")
+        func errorAndDontGenerateForThrowingFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3585,14 +3584,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3601,7 +3600,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3626,7 +3625,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3654,11 +3653,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericSomeFunctionDeclaration_isValid_butAsync() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for async function")
+        func warningAndGenerateForAsyncFunction() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3679,14 +3679,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3695,11 +3695,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3724,7 +3724,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3749,11 +3749,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericSomeFunctionDeclaration_isValid_butAsyncThrowing() {
-        assertMacroExpansion(
+        @Test("Warning and generate for async throwing function")
+        func warningAndGenerateForAsyncThrowing() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3774,14 +3775,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3790,11 +3791,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3819,7 +3820,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3844,11 +3845,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_whenManualExistentialGenericSomeDeclaration_hasIncorrectParameterCount() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Generate for incorrect parameter count")
+        func generateForIncorrectParameterCount() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3869,14 +3871,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3885,11 +3887,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3914,7 +3916,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -3927,11 +3929,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
             }
             """,
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericSomeFunctionDeclaration_hasIncorrectFunctionName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect function name")
+        func warningAndGenerateForIncorrectFunctionName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -3952,14 +3955,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -3968,11 +3971,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -3997,7 +4000,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -4022,11 +4025,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericSomeFunctionDeclaration_hasIncorrectParameterName() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect parameter name")
+        func warningAndGenerateForIncorrectParameterName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -4047,14 +4051,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -4063,11 +4067,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -4092,7 +4096,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -4117,11 +4121,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
+            )
+        }
 
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericSomeFunctionDeclaration_hasIncorrectParameterType() {
-        assertMacroExpansion(
+        @Test("Warning and generate for incorrect parameter type")
+        func warningAndGenerateForIncorrectParameterType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -4142,14 +4147,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -4158,11 +4163,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -4187,7 +4192,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -4212,11 +4217,12 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
-    }
-    
-    func testErrorCode_willGenerateChildOpaqueCodeFunction_andWillGenerateWarning_whenManualGenericSomeFunctionDeclaration_hasIncorrectReturnType() {
-        assertMacroExpansion(
+            )
+        }
+
+        @Test("Warning and generate for incorrect return type")
+        func warningAndGenerateForIncorrectReturnType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -4237,14 +4243,14 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                     errorCode.opaqueCode
                 }
             }
-            
+
             extension TestCode: ErrorCode {
 
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-            
+
                 var opaqueCode: String {
                     switch self {
                     case let .value1(child):
@@ -4253,11 +4259,11 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                         OpaqueCode.value2
                     }
                 }
-            
+
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-            
+
                 init(opaqueCode: String) throws {
 
                     var components = opaqueCode.split(separator: "-")
@@ -4282,7 +4288,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
 
                     }
                 }
-            
+
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -4307,6 +4313,7 @@ struct ErrorCodeManualChildOpaqueCodeFunctionTests {
                 )
             ],
             macros: MacroTesting.shared.testMacros
-        )
+            )
+        }
     }
 }
