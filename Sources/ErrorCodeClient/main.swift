@@ -23,7 +23,7 @@ public enum HTTPStatusCode: Int {
     case notFound = 404
 }
 
-public enum CodingErrorCode {
+public enum CodingErrorCode: Sendable {
     
     case encoding
     case decoding

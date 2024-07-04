@@ -1,11 +1,16 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_AccessModifierTests: XCTestCase {
+@Suite(
+    "Access modifiers",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeGeneration)
+)
+struct ErrorCodeAccessModifierTests {
 
-    func testErrorCode_willApplyPublicAccessModifier_toGeneratedCodeCorrectly() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Public")
+    func publicModifier() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -62,15 +67,12 @@ final class ErrorCode_AccessModifierTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willApplyInternalAccessModifier_toGeneratedCodeCorrectly() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Internal")
+    func internalModifier() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -127,15 +129,12 @@ final class ErrorCode_AccessModifierTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willApplyFilePrivateAccessModifier_toGeneratedCodeCorrectly() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Fileprivate")
+    func fileprivateModifier() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -192,15 +191,12 @@ final class ErrorCode_AccessModifierTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willApplyPrivateAccessModifier_toGeneratedCodeCorrectly() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Private")
+    func privateModifier() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -257,11 +253,7 @@ final class ErrorCode_AccessModifierTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
-
 }

@@ -1,11 +1,16 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_CustomOpaqueCodeCharactersTests: XCTestCase {
+@Suite(
+    "Custom code characters",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeGeneration)
+)
+struct ErrorCodeCustomOpaqueCodeCharactersTests {
 
-    func testErrorCode_willRespectCustomCustomOpaqueCodeCharacters() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Respects custom value")
+    func respectsCustomValue() {
         assertMacroExpansion(
             """
             @ErrorCode(codeCharacters: "123456")
@@ -62,15 +67,12 @@ final class ErrorCode_CustomOpaqueCodeCharactersTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomCustomOpaqueCodeCharacters_isProvidedAsExpression() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and use default value when provided as expression")
+    func warningAndUseDefaultValueWhenProvidedAsExpression() {
         assertMacroExpansion(
             """
             @ErrorCode(codeCharacters: "123" + "456")
@@ -139,15 +141,12 @@ final class ErrorCode_CustomOpaqueCodeCharactersTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomCustomOpaqueCodeCharacters_isProvidedAsFunction() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and use default value when provided as function")
+    func warningAndUseDefaultValueWhenProvidedAsFunction() {
         assertMacroExpansion(
             """
             @ErrorCode(codeCharacters: codeCharacters())
@@ -216,15 +215,12 @@ final class ErrorCode_CustomOpaqueCodeCharactersTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomCustomOpaqueCodeCharacters_isProvidedAsNonStringLiteral() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and use default value when provided as non string literal")
+    func warningAndUseDefaultValueWhenProvidedAsNonStringLiteral() {
         assertMacroExpansion(
             """
             @ErrorCode(codeCharacters: 123456)
@@ -293,15 +289,12 @@ final class ErrorCode_CustomOpaqueCodeCharactersTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomCustomOpaqueCodeCharacters_isProvidedAsEmptyStringLiteral() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and user default value when provided as empty string literal")
+    func warningAndUserDefaultValueWhenProvidedAsEmptyStringLiteral() {
         assertMacroExpansion(
             """
             @ErrorCode(codeCharacters: "")
@@ -370,15 +363,12 @@ final class ErrorCode_CustomOpaqueCodeCharactersTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willGenerateWarning_andUseDefaultValue_whenCustomCustomOpaqueCodeCharacters_isHasTooFewUniqueCharacters() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Warning and use default values when too few unique characters provided")
+    func warningAndUseDefaultValuesWhenTooFewUniqueCharactersProvided() {
         assertMacroExpansion(
             """
             @ErrorCode(codeCharacters: "1111111111")
@@ -447,10 +437,7 @@ final class ErrorCode_CustomOpaqueCodeCharactersTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 }

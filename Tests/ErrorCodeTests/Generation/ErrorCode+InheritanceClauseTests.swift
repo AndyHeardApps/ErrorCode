@@ -1,11 +1,16 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_InheritanceTests: XCTestCase {
+@Suite(
+    "Inheritance",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeGeneration)
+)
+struct ErrorCodeInheritanceTests {
 
-    func testErrorCode_willRespectExistingRawValue_andInheritanceClause() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Respects rawValue and inheritance clause")
+    func respectsRawValueAndInheritanceClause() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -62,15 +67,12 @@ final class ErrorCode_InheritanceTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotAddErrorCodeInheritance_whenManuallySpecified() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Will not add ErrorCode inheritance when manually specified")
+    func willNotAddErrorCodeInheritanceWhenManuallySpecified() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -127,11 +129,7 @@ final class ErrorCode_InheritanceTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
-
 }
