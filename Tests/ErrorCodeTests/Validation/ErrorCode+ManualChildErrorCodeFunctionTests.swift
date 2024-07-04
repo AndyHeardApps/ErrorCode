@@ -1,72 +1,86 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
+@Suite(
+    "Manual childErrorCode function",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeValidation)
+)
+struct ErrorCodeManualChildErrorCodeFunctionTests {}
 
-    // MARK: - Opaque code property
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualInitializerDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
-            """
-            @ErrorCode
-            enum TestCode {
-                case value1(Child)
-                case value2
-
-                init(opaqueCode: String) throws {
-                    self = .value2
-                }
-            }
-            """,
-            expandedSource: """
-            enum TestCode {
-                case value1(Child)
-                case value2
-
-                init(opaqueCode: String) throws {
-                    self = .value2
-                }
-            }
-            
-            extension TestCode: ErrorCode {
-
-                private enum OpaqueCode {
-                    static let value1 = "liBc"
-                    static let value2 = "M7aD"
-                }
-            
-                var opaqueCode: String {
-                    switch self {
-                    case let .value1(child):
-                        OpaqueCode.value1 + "-" + childOpaqueCode(for: child)
-                    case .value2:
-                        OpaqueCode.value2
-                    }
-                }
-            
-                private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
-                    errorCode.opaqueCode
-                }
-            }
-            """,
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
+// MARK: - Manual initializer
+extension ErrorCodeManualChildErrorCodeFunctionTests {
     
-    // MARK: - Generic
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+    @Suite("Manual initializer")
+    struct OpaqueCodeProperty {
+        
+        @Test("Don't generate if valid initializer is manually declared")
+        func dontGenerateIfValidInitializerIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
+            
+                init(opaqueCode: String) throws {
+                    self = .value2
+                }
+            }
+            """,
+            expandedSource: """
+            enum TestCode {
+                case value1(Child)
+                case value2
+            
+                init(opaqueCode: String) throws {
+                    self = .value2
+                }
+            }
+            
+            extension TestCode: ErrorCode {
+            
+                private enum OpaqueCode {
+                    static let value1 = "liBc"
+                    static let value2 = "M7aD"
+                }
+            
+                var opaqueCode: String {
+                    switch self {
+                    case let .value1(child):
+                        OpaqueCode.value1 + "-" + childOpaqueCode(for: child)
+                    case .value2:
+                        OpaqueCode.value2
+                    }
+                }
+            
+                private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
+                    errorCode.opaqueCode
+                }
+            }
+            """,
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+    }
+}
 
+// MARK: - Generic
+extension ErrorCodeManualChildErrorCodeFunctionTests {
+    
+    @Suite("Generic function")
+    struct Generic {
+        
+        @Test("Don't generate if valid function is manually declared")
+        func dontGenerateIfValidGenericFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
+            """
+            @ErrorCode
+            enum TestCode {
+                case value1(Child)
+                case value2
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -76,14 +90,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -103,30 +117,30 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -134,16 +148,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_isValid_butNonThrowing() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Don't generate if valid generic, non-throwing function is manually declared")
+        func dontGenerateIfValidGenericNonThrowingFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -186,30 +197,30 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -217,22 +228,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isValid_butAsync() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration is async")
+        func warningAndGenerateWhenManualFunctionDeclarationIsAsync() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String) async -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -242,14 +250,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String) async -> E {
                     try E(opaqueCode: opaqueCode)
                 }
             }
-
+            
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -269,34 +277,34 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -316,22 +324,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isValid_butAsyncThrowing() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration is async throwing")
+        func warningAndGenerateWhenManualFunctionDeclarationIsAsyncThrowing() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String) async throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -341,14 +346,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String) async throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
             }
-
+            
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -368,34 +373,34 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -415,22 +420,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_whenManualGenericFunctionDeclaration_hasIncorrectParameterCount() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Generate when manual function declaration has incorrect parameter count")
+        func generateWhenManualFunctionDeclarationHasIncorrectParameterCount() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String, other: Int) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -440,14 +442,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String, other: Int) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -465,29 +467,29 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
@@ -502,16 +504,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectFunctionName() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect function name")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectFunctionName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -534,7 +533,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -552,36 +551,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -601,16 +600,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectGenericInheritanceType() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect generic inheritance clause type")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectGenericInheritanceClauseType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -633,7 +629,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -651,36 +647,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -700,16 +696,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualFGenericunctionDeclaration_hasIncorrectParameterName() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect parameter name")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectParameterName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -732,7 +725,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -750,36 +743,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -799,16 +792,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectParameterType() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect parameter type")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectParameterType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -831,7 +821,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -849,36 +839,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -898,23 +888,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_hasIncorrectReturnType() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect return type")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectReturnType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> Int {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -924,14 +910,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> Int {
                     try E(opaqueCode: opaqueCode)
                 }
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -949,36 +935,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -998,22 +984,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericFunctionDeclaration_isNotStatic() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration is not static")
+        func warningAndGenerateWhenManualFunctionDeclarationIsNotStatic() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1023,14 +1006,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
             }
-
+            
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1048,36 +1031,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1097,23 +1080,27 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
+            macros: MacroTesting.shared.testMacros
+            )
+        }
     }
+}
+
+// MARK: - Generic where clause
+extension ErrorCodeManualChildErrorCodeFunctionTests {
     
-    // MARK: - Generic where clause
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+    @Suite("Generic where")
+    struct GenericWhere {
+        
+        @Test("Don't generate if valid function is manually declared")
+        func dontGenerateIfValidGenericFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String) throws -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1123,14 +1110,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String) throws -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1150,30 +1137,30 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1181,16 +1168,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willNotGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_isValid_butNonThrowing() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Don't generate if valid generic, non-throwing function is manually declared")
+        func dontGenerateIfValidGenericNonThrowingFunctionIsManuallyDeclared() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1233,30 +1217,30 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1264,22 +1248,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isValid_butAsync() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration is async")
+        func warningAndGenerateWhenManualFunctionDeclarationIsAsync() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String) async -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1289,14 +1270,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String) async -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
             }
-
+            
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1314,36 +1295,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1363,22 +1344,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isValid_butAsyncThrowing() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration is async throwing")
+        func warningAndGenerateWhenManualFunctionDeclarationIsAsyncThrowing() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String) async throws -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1388,14 +1366,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String) async throws -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
             }
-
+            
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1413,36 +1391,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1462,22 +1440,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterCount() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Generate when manual function declaration has incorrect parameter count")
+        func generateWhenManualFunctionDeclarationHasIncorrectParameterCount() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String, other: Int) throws -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1487,14 +1462,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String, other: Int) throws -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1512,36 +1487,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1549,16 +1524,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectFunctionName() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect function name")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectFunctionName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1581,7 +1553,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1599,36 +1571,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1648,16 +1620,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectGenericInheritanceType() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect generic inheritance clause type")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectGenericInheritanceClauseType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1680,7 +1649,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1698,36 +1667,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1747,16 +1716,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterName() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect parameter name")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectParameterName() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1779,7 +1745,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1797,36 +1763,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1846,16 +1812,13 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectParameterType() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect parameter type")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectParameterType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -1878,7 +1841,7 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1896,36 +1859,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -1945,22 +1908,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_hasIncorrectReturnType() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration has incorrect return type")
+        func warningAndGenerateWhenManualFunctionDeclarationHasIncorrectReturnType() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String) throws -> Int where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -1970,14 +1930,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 static func childErrorCode<E>(for opaqueCode: String) throws -> Int where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -1995,36 +1955,36 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 private func childOpaqueCode(for errorCode: some ErrorCode) -> String {
                     errorCode.opaqueCode
                 }
-
+            
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
             
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -2044,22 +2004,19 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willGenerateChildErrorCodeFunction_andWillGenerateWarning_whenManualGenericWhereFunctionDeclaration_isNotStatic() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and generate when manual function declaration is not static")
+        func warningAndGenerateWhenManualFunctionDeclarationIsNotStatic() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 func childErrorCode<E>(for opaqueCode: String) throws -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
@@ -2069,14 +2026,14 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
             enum TestCode {
                 case value1(Child)
                 case value2
-
+            
                 func childErrorCode<E>(for opaqueCode: String) throws -> E where E: ErrorCode {
                     try E(opaqueCode: opaqueCode)
                 }
             }
-
+            
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
@@ -2096,34 +2053,34 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     var components = opaqueCode.split(separator: "-")
                     guard components.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     let firstComponent = components.removeFirst()
                     switch firstComponent {
                     case OpaqueCode.value1:
                         let remainingComponents = components.joined(separator: "-")
                         self = try .value1(Self.childErrorCode(for: remainingComponents))
-
+            
                     case OpaqueCode.value2:
                         guard components.isEmpty else {
                             throw OpaqueCodeError.unusedOpaqueCodeComponents(components.map(String.init))
                         }
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(String(firstComponent))
-
+            
                     }
                 }
-
+            
                 private static func childErrorCode<E: ErrorCode>(for opaqueCode: String) throws -> E {
                     try E(opaqueCode: opaqueCode)
                 }
-
+            
                 private enum OpaqueCodeError: OpaqueCodeInitializerError {
                     case opaqueCodeIsEmpty
                     case unrecognizedOpaqueCode(String)
@@ -2143,10 +2100,8 @@ final class ErrorCode_ManualChildErrorCodeFunctionTests: XCTestCase {
                     severity: .warning
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
+            macros: MacroTesting.shared.testMacros
+            )
+        }
     }
 }

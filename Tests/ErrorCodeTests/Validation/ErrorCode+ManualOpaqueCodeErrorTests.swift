@@ -1,11 +1,16 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
-import XCTest
+import Testing
 
-final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
+@Suite(
+    "Manual OpaqueCodeError declaration",
+    .enabled(if: MacroTesting.shared.isEnabled),
+    .tags(.codeValidation)
+)
+struct ErrorCodeManualOpaqueCodeErrorTests {
     
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_whenManualOpaqueCodeErrorDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Don't generate if valid OpaqueErrorCode type is manually declared")
+    func dontGenerateIfValidOpaqueErrorCodeTypeIsManuallyDeclared() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -27,12 +32,12 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-
+            
                 var opaqueCode: String {
                     switch self {
                     case .value1:
@@ -43,34 +48,31 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
     
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_whenManualOpaqueCodeInitializerDeclaration_isValid() throws {
-        #if canImport(ErrorCodeMacros)
+    @Test("Don't generate if valid opaqueCode initializer is manually declared")
+    func dontGenerateIfValidOpaqueCodeInitializerIsManuallyDeclared() {
         assertMacroExpansion(
             """
             @ErrorCode
@@ -92,12 +94,12 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
             }
             
             extension TestCode: ErrorCode {
-
+            
                 private enum OpaqueCode {
                     static let value1 = "liBc"
                     static let value2 = "M7aD"
                 }
-
+            
                 var opaqueCode: String {
                     switch self {
                     case .value1:
@@ -108,17 +110,20 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             }
             """,
-            macros: testMacros
+            macros: MacroTesting.shared.testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
+}
+
+// MARK: - Enum declaration
+extension ErrorCodeManualOpaqueCodeErrorTests {
     
-    // MARK: - Enum declaration
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateError_whenManualOpaqueErrorCodeEnumDeclaration_hasNoInheritenceClause() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+    @Suite("Enum declaration")
+    struct EnumDeclaration {
+        
+        @Test("Error and don't generate when manual OpaqueCodeError declaration has no inheritence clause")
+        func errorAndDontGenerateWhenManualDeclarationHasNoInheritenceClause() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -155,21 +160,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
@@ -189,16 +194,13 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateError_whenManualOpaqueErrorCodeEnumDeclaration_doesNotInheritCorrectProtocol() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Error and don't generate when manual OpaqueCodeError declaration has incorrect inheritence clause")
+        func errorAndDontGenerateWhenManualDeclarationHasIncorrectInheritenceClause() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -235,21 +237,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
@@ -269,16 +271,13 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateWarning_whenManualOpaqueErrorCodeEnumDeclaration_hasUnnecessaryOpaqueCodeInitializerErrorConformance() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and don't generate when manual OpaqueCodeError declaration has unnecessary OpaqueCodeInitializerError conformance")
+        func warningAndDontGenerateWhenManualOpaqueCodeDeclarationHasUnnecessaryOpaqueCodeInitializerErrorConformance() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -299,7 +298,7 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
             
                 init(opaqueCode: String) {
                 }
-
+            
                 enum OpaqueCodeError: OpaqueCodeInitializerError {
                 }
             }
@@ -336,17 +335,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
+            macros: MacroTesting.shared.testMacros
+            )
+        }
     }
+}
 
-    // MARK: - Struct declaration
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateError_whenManualOpaqueErrorCodeStructDeclaration_hasNoInheritenceClause() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+// MARK: - Struct declaration
+extension ErrorCodeManualOpaqueCodeErrorTests {
+    
+    @Suite("Struct declaration")
+    struct StructDeclaration {
+        
+        @Test("Error and don't generate when manual OpaqueCodeError declaration has no inheritence clause")
+        func errorAndDontGenerateWhenManualDeclarationHasNoInheritenceClause() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -383,21 +386,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
@@ -417,16 +420,13 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateError_whenManualOpaqueErrorCodeStructDeclaration_doesNotInheritCorrectProtocol() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Error and don't generate when manual OpaqueCodeError declaration has incorrect inheritence clause")
+        func errorAndDontGenerateWhenManualDeclarationHasIncorrectInheritenceClause() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -445,7 +445,7 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 struct OpaqueCodeError: Sendable {
                 }
             }
-
+            
             extension TestCode: ErrorCode {
             
                 private enum OpaqueCode {
@@ -463,21 +463,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
@@ -497,16 +497,13 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateWarning_whenManualOpaqueErrorCodeStructDeclaration_hasUnnecessaryOpaqueCodeInitializerErrorConformance() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and don't generate when manual OpaqueCodeError declaration has unnecessary OpaqueCodeInitializerError conformance")
+        func warningAndDontGenerateWhenManualOpaqueCodeDeclarationHasUnnecessaryOpaqueCodeInitializerErrorConformance() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -527,7 +524,7 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
             
                 init(opaqueCode: String) {
                 }
-
+            
                 struct OpaqueCodeError: OpaqueCodeInitializerError {
                 }
             }
@@ -564,17 +561,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
+            macros: MacroTesting.shared.testMacros
+            )
+        }
     }
+}
 
-    // MARK: - Class declaration
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateError_whenManualOpaqueErrorCodeClassDeclaration_hasNoInheritenceClause() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+// MARK: - Class declaration
+extension ErrorCodeManualOpaqueCodeErrorTests {
+    
+    @Suite("Class declaration")
+    struct ClassDeclaration {
+        
+        @Test("Error and don't generate when manual OpaqueCodeError declaration has no inheritence clause")
+        func errorAndDontGenerateWhenManualDeclarationHasNoInheritenceClause() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -611,21 +612,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
@@ -645,16 +646,13 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateError_whenManualOpaqueErrorCodeClassDeclaration_doesNotInheritCorrectProtocol() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Error and don't generate when manual OpaqueCodeError declaration has incorrect inheritence clause")
+        func errorAndDontGenerateWhenManualDeclarationHasIncorrectInheritenceClause() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -691,21 +689,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
@@ -725,16 +723,13 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateWarning_whenManualOpaqueErrorCodeClassDeclaration_hasUnnecessaryOpaqueCodeInitializerErrorConformance() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and don't generate when manual OpaqueCodeError declaration has unnecessary OpaqueCodeInitializerError conformance")
+        func warningAndDontGenerateWhenManualOpaqueCodeDeclarationHasUnnecessaryOpaqueCodeInitializerErrorConformance() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -755,7 +750,7 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
             
                 init(opaqueCode: String) {
                 }
-
+            
                 class OpaqueCodeError: OpaqueCodeInitializerError {
                 }
             }
@@ -792,17 +787,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
+            macros: MacroTesting.shared.testMacros
+            )
+        }
     }
+}
 
-    // MARK: - Actor declaration
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateError_whenManualOpaqueErrorCodeActorDeclaration_hasNoInheritenceClause() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+// MARK: - Actor declaration
+extension ErrorCodeManualOpaqueCodeErrorTests {
+    
+    @Suite("Actor declaration")
+    struct ActorDeclaration {
+        
+        @Test("Error and don't generate when manual OpaqueCodeError declaration has no inheritence clause")
+        func errorAndDontGenerateWhenManualDeclarationHasNoInheritenceClause() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -839,21 +838,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
@@ -873,16 +872,13 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateError_whenManualOpaqueErrorCodeActorDeclaration_doesNotInheritCorrectProtocol() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Error and don't generate when manual OpaqueCodeError declaration has incorrect inheritence clause")
+        func errorAndDontGenerateWhenManualDeclarationHasIncorrectInheritenceClause() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -919,21 +915,21 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                 }
             
                 init(opaqueCode: String) throws {
-
+            
                     guard opaqueCode.isEmpty == false else {
                         throw OpaqueCodeError.opaqueCodeIsEmpty
                     }
-
+            
                     switch opaqueCode {
                     case OpaqueCode.value1:
                         self = .value1
-
+            
                     case OpaqueCode.value2:
                         self = .value2
-
+            
                     default:
                         throw OpaqueCodeError.unrecognizedOpaqueCode(opaqueCode)
-
+            
                     }
                 }
             }
@@ -953,16 +949,13 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
-    
-    func testErrorCode_willNotGenerateOpaqueCodeErrorEnum_andWillGenerateWarning_whenManualOpaqueErrorCodeActorDeclaration_hasUnnecessaryOpaqueCodeInitializerErrorConformance() throws {
-        #if canImport(ErrorCodeMacros)
-        assertMacroExpansion(
+            macros: MacroTesting.shared.testMacros
+            )
+        }
+        
+        @Test("Warning and don't generate when manual OpaqueCodeError declaration has unnecessary OpaqueCodeInitializerError conformance")
+        func warningAndDontGenerateWhenManualOpaqueCodeDeclarationHasUnnecessaryOpaqueCodeInitializerErrorConformance() {
+            assertMacroExpansion(
             """
             @ErrorCode
             enum TestCode {
@@ -983,7 +976,7 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
             
                 init(opaqueCode: String) {
                 }
-
+            
                 actor OpaqueCodeError: Sendable, OpaqueCodeInitializerError {
                 }
             }
@@ -1020,10 +1013,8 @@ final class ErrorCode_ManualOpaqueCodeErrorTests: XCTestCase {
                     ]
                 )
             ],
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
+            macros: MacroTesting.shared.testMacros
+            )
+        }
     }
 }
