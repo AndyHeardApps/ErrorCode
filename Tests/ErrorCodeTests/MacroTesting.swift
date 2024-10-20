@@ -17,7 +17,8 @@ struct MacroTesting {
         
         #if canImport(ErrorCodeMacros)
         self.testMacros = [
-            "obfuscate" : ErrorCodeMacro.self
+            "ErrorCode" : ErrorCodeMacro.self,
+            "ErrorCodeExtension" : ErrorCodeMacro.self
         ]
         self.isEnabled = true
         #else

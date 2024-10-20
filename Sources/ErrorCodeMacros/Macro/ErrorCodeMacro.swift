@@ -332,12 +332,11 @@ extension ErrorCodeMacro: ExtensionMacro {
         
         let inheritedTypeNames = syntax?.inheritedTypes
             .compactMap { type in
-                type.as(InheritedTypeSyntax.self)?
-                    .type
-                    .as(IdentifierTypeSyntax.self)?
-                    .name.text
+                type.type.trimmedDescription
+                    .replacingOccurrences(of: "@retroactive", with: "")
+                    .trimmingCharacters(in: .whitespaces)
             } ?? []
-        
+
         if inheritedTypeNames.contains("ErrorCode") {
             return nil
         }
