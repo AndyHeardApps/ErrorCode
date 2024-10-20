@@ -25,7 +25,7 @@ extension ErrorCodeMacro {
                         )
                     ]
                 ),
-                effectSpecifiers: .init(throwsSpecifier: .keyword(.throws))
+                effectSpecifiers: .init(throwsClause: .init(throwsSpecifier: .keyword(.throws)))
             ),
             body: .init(statements: bodyStatements(enumCases: enumCases, childCodeDelimiter: childCodeDelimiter))
         )

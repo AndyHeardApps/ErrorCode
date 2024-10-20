@@ -189,7 +189,7 @@ extension ErrorCodeMacro {
         var fixItGetterDeclaration = getterDeclaration
         fixItGetterDeclaration.effectSpecifiers = nil
         
-        if effectSpecifiers.asyncSpecifier != nil && effectSpecifiers.throwsSpecifier != nil {
+        if effectSpecifiers.asyncSpecifier != nil && effectSpecifiers.throwsClause?.throwsSpecifier != nil {
             throw DiagnosticsError(diagnostics: [
                 Diagnostic(
                     node: effectSpecifiers,
@@ -213,7 +213,7 @@ extension ErrorCodeMacro {
                     )
                 )
             ])
-        } else if effectSpecifiers.throwsSpecifier != nil {
+        } else if effectSpecifiers.throwsClause?.throwsSpecifier != nil {
             throw DiagnosticsError(diagnostics: [
                 Diagnostic(
                     node: effectSpecifiers,

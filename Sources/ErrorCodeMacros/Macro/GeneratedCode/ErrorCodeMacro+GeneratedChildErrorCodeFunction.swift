@@ -28,7 +28,7 @@ extension ErrorCodeMacro {
                         )
                     ]
                 ),
-                effectSpecifiers: .init(throwsSpecifier: .keyword(.throws)),
+                effectSpecifiers: .init(throwsClause: .init(throwsSpecifier: .keyword(.throws))),
                 returnClause: .init(type: TypeSyntax(stringLiteral: "E"))
             ),
             body: CodeBlockSyntax {

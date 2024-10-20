@@ -72,8 +72,7 @@ extension ErrorCodeMacro {
         
         let inheritedTypeNames = declaration.inheritanceClause?.inheritedTypes
             .compactMap { type in
-                type.as(InheritedTypeSyntax.self)?
-                    .type
+                type.type
                     .as(IdentifierTypeSyntax.self)?
                     .name.text
             } ?? []
@@ -119,8 +118,7 @@ extension ErrorCodeMacro {
         
         let inheritedTypeNames = declaration.inheritanceClause?.inheritedTypes
             .compactMap { type in
-                type.as(InheritedTypeSyntax.self)?
-                    .type
+                type.type
                     .as(IdentifierTypeSyntax.self)?
                     .name.text
             } ?? []

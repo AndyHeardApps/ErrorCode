@@ -153,7 +153,7 @@ extension ErrorCodeMacro {
                 continue
             }
             
-            let bindings = variableDeclaration.bindings.compactMap { $0.as(PatternBindingSyntax.self) }
+            let bindings = variableDeclaration.bindings
             for binding in bindings {
                 
                 guard 
