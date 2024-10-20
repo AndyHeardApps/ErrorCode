@@ -374,7 +374,7 @@ extension ErrorCodeMacro {
     
     private static func functionDoesNotThrow(_ functionDeclaration: FunctionDeclSyntax) -> Bool {
         
-        functionDeclaration.signature.effectSpecifiers?.throwsSpecifier == nil
+        functionDeclaration.signature.effectSpecifiers?.throwsClause?.throwsSpecifier == nil
     }
     
     private static func throwingFunctionFixitDiagnostic(for functionDeclaration: FunctionDeclSyntax) -> Diagnostic {
