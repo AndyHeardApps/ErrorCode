@@ -1,5 +1,10 @@
 # ErrorCode
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAndyHeardApps%2FErrorCode%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/AndyHeardApps/ErrorCode)
+![GitHub License](https://img.shields.io/github/license/andyheardapps/ErrorCode)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/andyheardapps/errorcode/build.yml)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAndyHeardApps%2FErrorCode%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/AndyHeardApps/ErrorCode)
+
 The package contains tools for the automatic generation of opaque error codes. Surfacing low level errors can be problematic because, as developers, we want to know where and why an error occurred, and we want a user or analytics to be able to report this to us, however we don't want to risk exposing implementation details of our code to potenital malicious actors. For instance a networking error may unintentionally expose details that open us up to person-in-the-middle attacks, or may expose how the back end is being hosted, which could provide information for possible attacks on infrastructure.
 
 Consider an error called `MyError.usernameCorrectPasswordIncorrect`. If this raw text were exposed to the user, it would show that the provided username exists, which is a potential leak of critical information.
